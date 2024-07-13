@@ -1,0 +1,44 @@
+<script>
+  import { groupTabMock } from "../../mocks/groupTabMock";
+  export let tabSelected;
+  export let onUpdateTabSelected;
+
+  const onButtonClick = (id) => {
+    onUpdateTabSelected(id);
+  };
+</script>
+
+<section class="flex pb-5 gap-4">
+  {#each groupTabMock as { label, id }}
+    <button
+      class={tabSelected === id && 'active'}
+      on:click={() => onButtonClick(id)}
+    >
+      {label}
+    </button>
+  {/each}
+</section>
+
+<style lang="scss">
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 10px 10px 0 0;
+    line-height: 1.5;
+    padding: 0.5rem 1rem;
+    border-bottom: 2px solid transparent;
+
+    @apply text-neutral-300;
+  }
+
+  button:hover {
+    @apply bg-neutral-700;
+  }
+
+  button.active {
+    @apply border-b-2 border-neutral-300;
+  }
+</style>
