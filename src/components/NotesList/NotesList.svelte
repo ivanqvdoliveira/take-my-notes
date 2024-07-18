@@ -1,6 +1,9 @@
 <script>
   import { onMount } from 'svelte';
-  import { selectedTab, listNotes } from '../../store/stores';
+  import { listNotes } from '../../store/stores';
+  import OthersList from './components/OthersList.svelte';
+  import ServersList from './components/ServersList.svelte';
+  import PasswordsList from './components/PasswordsList.svelte';
   export let seletecdItem = null;
   export let filteredList;
   let selectedName = null;
@@ -96,8 +99,8 @@
   }
 
   const toggleVisibility = (id) => {
+    idPassword = id;
     isvisible = !isvisible;
-    idPassword = id === idPassword ? null : id;
   }
 </script>
 
@@ -147,199 +150,49 @@
     </div>
   {:else}
     {#if $listNotes?.password}
-      <div class="container">
-        <h2>Senhas</h2>
-        {#each passwordList as { password, items, id }}
-          <div class="p-2">
-            <div class="item-container">
-              <span>{
-                isvisible && idPassword === id ? password : getFormattedPassword(password)
-              }</span>
-              {#if copied && id === idPassword}
-                <div class="copied">copiado</div>
-              {/if}
-              <button class="icon" on:click={() => copyText(password, id)}>
-                <i class="fa-solid fa-copy" />
-              </button>
-              <button class="icon" on:click={() => toggleVisibility(id)}>
-                <i class="fa-solid fa-eye-slash" />
-              </button>
-              <button on:click={() => onClickItem(id)}>
-                <i class={`fa-solid fa-bars-staggered ${id === seletecdItem && 'text-orange-600'}`} />
-              </button>
-              <button class="icon" on:click={() => onCreateClick(id)}>
-                <i class="fa-solid fa-square-plus text-emerald-700" />
-              </button>
-            </div>
-
-            {#if newForm && id === seletecdItem}
-              <div class="w-full p-3">
-                <div>
-                  <input type="text" placeholder="Senha" value={password} />
-                  <input type="text" placeholder="Nome" value={form?.name || ''} />
-                  <input type="text" placeholder="Url" value={form?.url || ''} />
-                  <input type="text" placeholder="Obs" value={form?.observation || ''} />
-                </div>
-                <div class="flex justify-between pt-4">
-                  <button class="button cancel" on:click={() => onCancelCreateClick()}>
-                    <i class="fa-solid fa-xmark" />
-                    Cancelar
-                  </button>
-                  <button class="button edit">
-                    <i class="fa-solid fa-save" />
-                    Salvar
-                  </button>
-                </div>
-              </div>
-            {/if}
-
-            {#if id === seletecdItem && !newForm}
-              <ul class="sub-item">
-                {#if selectedName && !isEdit}
-                  <div class="w-full p-3">
-                    <div class="text-base">
-                      <p><b>Nome:</b> {selectedName.name}</p>
-                      <p><b>Url:</b> {selectedName.url}</p>
-                      <p><b>Obs:</b> {selectedName.observation}</p>
-                    </div>
-                    <div class="flex justify-between pt-4">
-                      <button class="button cancel" on:click={() => onCancelClick()}>
-                        <i class="fa-solid fa-xmark" />
-                        Fechar
-                      </button>
-                      <button class="button edit" on:click={() => onEditClick(password)}>
-                        <i class="fa-regular fa-pen-to-square" />
-                        Editar
-                      </button>
-                    </div>
-                  </div>
-                {:else if selectedName && isEdit}
-                  <div class="w-full p-3">
-                    <div>
-                      <input type="text" placeholder="Senha" value={form.password || ''} />
-                      <input type="text" placeholder="Nome" value={form.name || ''} />
-                      <input type="text" placeholder="Url" value={form.url || ''} />
-                      <input type="text" placeholder="Obs" value={form.observation || ''} />
-                    </div>
-                    <div class="flex justify-between pt-4">
-                      <button class="button cancel" on:click={() => onCancelEditClick()}>
-                        <i class="fa-solid fa-xmark" />
-                        Fechar
-                      </button>
-                      <button class="button edit">
-                        <i class="fa-solid fa-save" />
-                        Salvar
-                      </button>
-                    </div>
-                  </div>
-                {:else}
-                  {#each items as item}
-                    <li>
-                      <button
-                        class="pass-item"
-                        on:click={() => onClickName(item)}
-                      >{item.name}</button>
-                    </li>
-                  {/each}
-                {/if}
-              </ul>
-            {/if}
-
-          </div>
-        {/each}
-      </div>
+      <PasswordsList 
+        isvisible={isvisible}
+        idPassword={idPassword}
+        getFormattedPassword={getFormattedPassword}
+        toggleVisibility={toggleVisibility}
+        copied={copied}
+        copyText={copyText}
+        passwordList={passwordList}
+        onClickName={onClickName}
+        onClickItem={onClickItem}
+        selectedName={selectedName}
+        isEdit={isEdit}
+        onEditClick={onEditClick}
+        onCancelEditClick={onCancelEditClick}
+        form={form}
+        newForm={newForm}
+        seletecdItem={seletecdItem}
+        onCancelCreateClick={onCancelCreateClick}
+        onCreateClick={onCreateClick}
+        onCancelClick={onCancelClick}
+      />
     {/if}
 
     {#if $listNotes?.server}
-      <div class="container">
-        <h2>Servidores</h2>
-        {#each $listNotes.server as {
-          id, clientName, observation, serviceList
-        }}
-          <div class="p-2">
-            <div class="item-container">
-              <span>{clientName}</span>
-              <button class="icon">
-                <i class="fa-solid fa-eye" />
-              </button>
-            </div>
-            {#if serviceList}
-              <ul class="sub-item server">
-                {#each serviceList as service}
-                  <li class="border border-dashed border-neutral-800">
-                    <h2>{service.name}</h2>
-                    <div class="p-2 text-base">
-                      <p>
-                        <b>Login:</b>
-                        {service?.login || '-'}
-                      </p>
-                      <p class="flex items-center gap-1 relative">
-                        <b>Senha:</b>
-                        {isvisible && idPassword === service.id ? service.password : getFormattedPassword(service.password)}
-                        <button class="icon server" on:click={() => toggleVisibility(service.id)}>
-                          <i class="fa-solid fa-eye-slash" />
-                        </button>
-                        {#if copied && service.id === idPassword}
-                          <div class="copied">copiado</div>
-                        {/if}
-                        <button class="icon server" on:click={() => copyText(service.password, service.id)}>
-                          <i class="fa-solid fa-copy" />
-                        </button>
-                      </p>
-                      <p>
-                        <b>Url:</b>
-                        {service?.url || '-'}
-                      </p>
-                    </div>
-                  </li>
-                {/each}
-                <li>
-                  <p>
-                    <b class="text-base">Observação:</b>
-                    <span>{observation || '-'}</span>
-                  </p>
-                </li>
-              </ul>
-            {/if}
-          </div>
-        {/each}
-      </div>
+      <ServersList
+        isvisible={isvisible}
+        idPassword={idPassword}
+        getFormattedPassword={getFormattedPassword}
+        toggleVisibility={toggleVisibility}
+        copied={copied}
+        copyText={copyText}
+      />
     {/if}
 
     {#if $listNotes?.others}
-      <div class="container">
-        <h2>Outros</h2>
-        <ul class="sub-item server">
-          {#each $listNotes.others as other}
-            <li class="border border-dashed border-neutral-800">
-              <h2>{other.name}</h2>
-              <div class="p-2 text-base">
-                <p>
-                  <b>Login:</b>
-                  {other?.login || '-'}
-                </p>
-                <p class="flex items-center gap-1 relative">
-                  <b>Senha:</b>
-                  {isvisible && idPassword === other.id ? other.password : getFormattedPassword(other.password, other.id)}
-                  <button class="icon server" on:click={() => toggleVisibility(other.id)}>
-                    <i class="fa-solid fa-eye-slash" />
-                  </button>
-                  {#if copied && other.id === idPassword}
-                    <div class="copied">copiado</div>
-                  {/if}
-                  <button class="icon server" on:click={() => copyText(other.password, other.id)}>
-                    <i class="fa-solid fa-copy" />
-                  </button>
-                </p>
-                <p>
-                  <b>Observação:</b>
-                  {other?.observation || '-'}
-                </p>
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </div>
+      <OthersList
+        isvisible={isvisible}
+        idPassword={idPassword}
+        getFormattedPassword={getFormattedPassword}
+        toggleVisibility={toggleVisibility}
+        copied={copied}
+        copyText={copyText}
+      />
     {/if}
   {/if}
 
@@ -365,29 +218,8 @@
       }
     }
 
-    &.pass-item {
-      display: inline-block;
-      @apply text-neutral-200 hover:bg-neutral-500 rounded p-2;
-    }
-
     i {
       font-size: 1.5rem
-    }
-
-    &.button {
-      @apply bg-neutral-700 text-neutral-300 p-2 rounded;
-
-      i {
-        font-size: 0.8rem;
-      }
-
-      &.cancel {
-        @apply bg-red-600;
-      }
-
-      &.edit {
-        @apply bg-emerald-700;
-      }
     }
   }
 
@@ -415,10 +247,6 @@
     @apply border-b border-neutral-600 p-2 font-bold bg-neutral-800 text-neutral-300 text-lg;
   }
 
-  .item-container {
-    @apply flex gap-3 align-middle border border-solid border-neutral-600 p-2 text-neutral-400 bg-neutral-700 relative;
-  }
-
   .sub-item {
     @apply border border-solid border-neutral-600 p-2 text-neutral-300 bg-neutral-600 text-[13px] flex flex-wrap gap-2;
 
@@ -429,13 +257,5 @@
         @apply w-full mb-3;
       }
     }
-  }
-
-  span {
-    @apply w-full flex items-center text-neutral-200;
-  }
-
-  input {
-    @apply w-full p-2 border border-solid border-neutral-600 bg-neutral-700 text-neutral-300 rounded mb-2;
   }
 </style>
