@@ -1,19 +1,21 @@
 <script>
   import { onMount } from 'svelte';
-  import { listNotes } from '../../store/stores';
+  import { listNotes, loadPage } from '../../store/stores';
   import OthersList from './components/OthersList.svelte';
   import ServersList from './components/ServersList.svelte';
   import PasswordsList from './components/PasswordsList.svelte';
+  import CreateFloatingButton from '../CreateFloatingButton/CreateFloatingButton.svelte';
   export let seletecdItem = null;
   export let filteredList;
   let selectedName = null;
   let isEdit = false;
   let passwordList = [];
   let form = {};
-  let newForm = false;
+  let newFormPassword = false;
   let isvisible = false;
   let idPassword = null;
   let copied = false;
+  let isLoading = true
 
   onMount(() => {
     async function fetchData() {
@@ -23,6 +25,7 @@
     }
 
     fetchData();
+    isLoading = $loadPage
   });
 
   const aggregatePasswords = (passwords) => {
@@ -89,13 +92,17 @@
   }
 
   const onCancelCreateClick = () => {
-    newForm = false;
+    newFormPassword = false;
     seletecdItem = null;
   }
 
   const onCreateClick = (id) => {
-    newForm = true;
+    newFormPassword = true;
     seletecdItem = id;
+  }
+
+  const onAddNewClick = () => {
+
   }
 
   const toggleVisibility = (id) => {
@@ -105,97 +112,105 @@
 </script>
 
 <section>
-  {#if filteredList}
-    <div class="container">
-      <h2>Resultados</h2>
-      <ul class="sub-item server">
-        {#if filteredList.length === 0}
-          <li>
-            <p class="block w-full text-lg text-center py-10 text-orange-400">Nenhum resultado encontrado</p>
-          </li>
-        {/if}
-        {#each filteredList as item}
-          <li class="border border-dashed border-neutral-800">
-            <h2>{item.name}</h2>
-            <div class="p-2 text-base">
-              <p>
-                <b>Login:</b>
-                {item?.login || '-'}
-              </p>
-              <p class="flex items-center gap-1 relative">
-                <b>Senha:</b>
-                {isvisible && idPassword === item.id ? item.password : getFormattedPassword(item.password)}
-                <button class="icon server" on:click={() => toggleVisibility(item.id)}>
-                  <i class="fa-solid fa-eye-slash" />
-                </button>
-                {#if copied && item.id === idPassword}
-                  <div class="copied">copiado</div>
-                {/if}
-                <button class="icon server" on:click={() => copyText(item.password, item.id)}>
-                  <i class="fa-solid fa-copy" />
-                </button>
-              </p>
-              <p>
-                <b>Observação:</b>
-                {item?.observation || '-'}
-              </p>
-              <p>
-                <b>Url:</b>
-                {item?.url || '-'}
-              </p>
-            </div>
-          </li>
-        {/each}
-      </ul>
+  {#if isLoading}
+    <div class="flex justify-center items-center gap-5 py-14">
+      <i class="fas fa-spinner fa-spin fa-3x text-orange-400"></i>
+      <h3 class="text-orange-400">Carregando...</h3>
     </div>
   {:else}
-    {#if $listNotes?.password}
-      <PasswordsList 
-        isvisible={isvisible}
-        idPassword={idPassword}
-        getFormattedPassword={getFormattedPassword}
-        toggleVisibility={toggleVisibility}
-        copied={copied}
-        copyText={copyText}
-        passwordList={passwordList}
-        onClickName={onClickName}
-        onClickItem={onClickItem}
-        selectedName={selectedName}
-        isEdit={isEdit}
-        onEditClick={onEditClick}
-        onCancelEditClick={onCancelEditClick}
-        form={form}
-        newForm={newForm}
-        seletecdItem={seletecdItem}
-        onCancelCreateClick={onCancelCreateClick}
-        onCreateClick={onCreateClick}
-        onCancelClick={onCancelClick}
-      />
-    {/if}
+    {#if filteredList}
+      <div class="container">
+        <h2>Resultados</h2>
+        <ul class="sub-item server">
+          {#if filteredList.length === 0}
+            <li>
+              <p class="block w-full text-lg text-center py-10 text-orange-400">Nenhum resultado encontrado</p>
+            </li>
+          {/if}
+          {#each filteredList as item}
+            <li class="border border-dashed border-neutral-800">
+              <h2>{item.name}</h2>
+              <div class="p-2 text-base">
+                <p>
+                  <b>Login:</b>
+                  {item?.login || '-'}
+                </p>
+                <p class="flex items-center gap-1 relative">
+                  <b>Senha:</b>
+                  {isvisible && idPassword === item.id ? item.password : getFormattedPassword(item.password)}
+                  <button class="icon server" on:click={() => toggleVisibility(item.id)}>
+                    <i class="fa-solid fa-eye-slash" />
+                  </button>
+                  {#if copied && item.id === idPassword}
+                    <div class="copied">copiado</div>
+                  {/if}
+                  <button class="icon server" on:click={() => copyText(item.password, item.id)}>
+                    <i class="fa-solid fa-copy" />
+                  </button>
+                </p>
+                <p>
+                  <b>Observação:</b>
+                  {item?.observation || '-'}
+                </p>
+                <p>
+                  <b>Url:</b>
+                  {item?.url || '-'}
+                </p>
+              </div>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {:else}
+      {#if $listNotes?.password}
+        <PasswordsList 
+          isvisible={isvisible}
+          idPassword={idPassword}
+          getFormattedPassword={getFormattedPassword}
+          toggleVisibility={toggleVisibility}
+          copied={copied}
+          copyText={copyText}
+          passwordList={passwordList}
+          onClickName={onClickName}
+          onClickItem={onClickItem}
+          selectedName={selectedName}
+          isEdit={isEdit}
+          onEditClick={onEditClick}
+          onCancelEditClick={onCancelEditClick}
+          form={form}
+          newForm={newFormPassword}
+          seletecdItem={seletecdItem}
+          onCancelCreateClick={onCancelCreateClick}
+          onCreateClick={onCreateClick}
+          onCancelClick={onCancelClick}
+        />
+      {/if}
 
-    {#if $listNotes?.server}
-      <ServersList
-        isvisible={isvisible}
-        idPassword={idPassword}
-        getFormattedPassword={getFormattedPassword}
-        toggleVisibility={toggleVisibility}
-        copied={copied}
-        copyText={copyText}
-      />
-    {/if}
+      {#if $listNotes?.server}
+        <ServersList
+          isvisible={isvisible}
+          idPassword={idPassword}
+          getFormattedPassword={getFormattedPassword}
+          toggleVisibility={toggleVisibility}
+          copied={copied}
+          copyText={copyText}
+        />
+      {/if}
 
-    {#if $listNotes?.others}
-      <OthersList
-        isvisible={isvisible}
-        idPassword={idPassword}
-        getFormattedPassword={getFormattedPassword}
-        toggleVisibility={toggleVisibility}
-        copied={copied}
-        copyText={copyText}
-      />
+      {#if $listNotes?.others}
+        <OthersList
+          isvisible={isvisible}
+          idPassword={idPassword}
+          getFormattedPassword={getFormattedPassword}
+          toggleVisibility={toggleVisibility}
+          copied={copied}
+          copyText={copyText}
+        />
+      {/if}
     {/if}
   {/if}
 
+  <CreateFloatingButton onClick={onAddNewClick}/>
 </section>
 
 
