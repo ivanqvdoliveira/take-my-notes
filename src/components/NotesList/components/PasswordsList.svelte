@@ -152,17 +152,17 @@
       }
 
       &.cancel {
-        @apply bg-red-600;
+        @apply bg-red-600 hover:bg-red-800;
       }
 
       &.edit {
-        @apply bg-emerald-700;
+        @apply bg-emerald-700 hover:bg-emerald-800;
       }
     }
   }
 
   .container {
-    @apply border border-solid border-neutral-600 mt-5;
+    @apply border border-solid border-neutral-600 mt-5 mx-auto;
   }
 
   .copied {

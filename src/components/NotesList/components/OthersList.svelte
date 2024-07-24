@@ -68,7 +68,7 @@ i {
   }
 
   .container {
-    @apply border border-solid border-neutral-600 mt-5;
+    @apply border border-solid border-neutral-600 mt-5  mx-auto;
   }
 
   .copied {

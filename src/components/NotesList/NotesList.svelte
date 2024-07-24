@@ -5,6 +5,7 @@
   import ServersList from './components/ServersList.svelte';
   import PasswordsList from './components/PasswordsList.svelte';
   import CreateFloatingButton from '../CreateFloatingButton/CreateFloatingButton.svelte';
+  import FormModal from '../modals/FormModal.svelte';
   export let seletecdItem = null;
   export let filteredList;
   let selectedName = null;
@@ -16,6 +17,7 @@
   let idPassword = null;
   let copied = false;
   let isLoading = true
+  let showModal = false
 
   onMount(() => {
     async function fetchData() {
@@ -102,7 +104,7 @@
   }
 
   const onAddNewClick = () => {
-
+    showModal = true;
   }
 
   const toggleVisibility = (id) => {
@@ -211,6 +213,12 @@
   {/if}
 
   <CreateFloatingButton onClick={onAddNewClick}/>
+
+  {#if showModal}
+    <FormModal
+      onClose={() => showModal = false}
+    />
+  {/if}
 </section>
 
 
@@ -239,7 +247,7 @@
   }
 
   .container {
-    @apply border border-solid border-neutral-600 mt-5;
+    @apply border border-solid border-neutral-600 mt-5 mx-auto;
   }
 
   .copied {
