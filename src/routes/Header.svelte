@@ -1,8 +1,10 @@
 <script>
 	import { getAuth, onAuthStateChanged } from 'firebase/auth';
+	import db from '../firebase';
+	import { getDocs, collection } from 'firebase/firestore';
   import { app } from '../firebase';
   import { onMount } from 'svelte';
-  import { loadPage } from '../store/stores';
+  import { loadPage, groupCollection, typeCollection } from '../store/stores';
 
 	let url = '/'
 
@@ -20,6 +22,26 @@
 				window.location.href = login
 			}
 		})
+	})
+
+	onMount(async () => {
+		const groupRef = collection(db, 'my-groups');
+		const typeRef = collection(db, 'my-types');
+
+		const [groupSnapshot, typeSnapshot] = await Promise.all([
+			getDocs(groupRef),
+			getDocs(typeRef)
+		]);
+		groupCollection.set(
+			groupSnapshot.docs.map(
+				doc => ({ id: doc.id, ...doc.data() })
+			)
+		);
+		typeCollection.set(
+			typeSnapshot.docs.map(
+				doc => ({ id: doc.id, ...doc.data() })
+			)
+		);
 	})
 
 	const logout = () => {

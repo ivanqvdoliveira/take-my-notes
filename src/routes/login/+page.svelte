@@ -1,9 +1,4 @@
 <script>
-  // import db from '../../firebase';
-  // import {
-  //   addDoc,
-  //   collection,
-  // } from 'firebase/firestore';
   import {
     getAuth,
     signInWithEmailAndPassword,
@@ -13,15 +8,6 @@
   let email;
   let password;
   let loginError = null
-
-  // const handleSubmit = async (e) => {
-  //   console.log(e.target.value)
-  //   e.preventDefault();
-  //   await addDoc(collection(db, "my-notes"), {
-  //     name: input,
-  //     Id: crypto.randomUUID(),
-  //   });
-  // }
 
   const loginWithEmail = () => {
     console.log('email', email.value, 'password', password.value)
@@ -44,7 +30,7 @@
   }
 </script>
 
-<div class="login container">
+<div class="login container mx-auto">
   <form on:submit={loginWithEmail}>
     <label for="email">
       Email
