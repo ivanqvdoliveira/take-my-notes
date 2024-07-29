@@ -10,7 +10,6 @@
   let loginError = null
 
   const loginWithEmail = () => {
-    console.log('email', email.value, 'password', password.value)
     if (!email || !password) {
       modalMsg = 'Favor preencher email e senha'
       return

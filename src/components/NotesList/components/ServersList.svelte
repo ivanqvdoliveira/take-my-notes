@@ -1,6 +1,5 @@
 <script>
-  import { listNotes } from '../../../store/stores';
-
+  export let listOfServers;
   export let isvisible;
   export let idPassword;
   export let getFormattedPassword;
@@ -11,21 +10,18 @@
 
 <div class="container">
   <h2>Servidores</h2>
-  {#each $listNotes.server as {
-    id, clientName, observation, serviceList
+  {#each listOfServers as {
+    clientName, observation, services
   }}
     <div class="p-2">
       <div class="item-container">
         <span>{clientName}</span>
-        <button class="icon">
-          <i class="fa-solid fa-eye" />
-        </button>
       </div>
-      {#if serviceList}
+      {#if services}
         <ul class="sub-item server">
-          {#each serviceList as service}
+          {#each services as service}
             <li class="border border-dashed border-neutral-800">
-              <h2>{service.name}</h2>
+              <h2>{service.serviceName}</h2>
               <div class="p-2 text-base">
                 <p>
                   <b>Login:</b>

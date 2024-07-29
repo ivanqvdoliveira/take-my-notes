@@ -1,54 +1,27 @@
 <script>
-  import { onMount } from 'svelte';
-  import { listNotes, loadPage } from '../../store/stores';
+  import { listNotes, loadPage, selectedTab } from '../../store/stores';
   import OthersList from './components/OthersList.svelte';
   import ServersList from './components/ServersList.svelte';
   import PasswordsList from './components/PasswordsList.svelte';
   import CreateFloatingButton from '../CreateFloatingButton/CreateFloatingButton.svelte';
   import FormModal from '../modals/FormModal.svelte';
-  export let seletecdItem = null;
+  import { addNotes } from '../../requests/addNotes';
+  import { requestNotes } from '../../requests/requestNotes';
+  export let selectedItem = null;
   export let filteredList;
+  export let passwordList;
+  export let serverList;
+  export let othersList;
   let selectedName = null;
   let isEdit = false;
-  let passwordList = [];
   let form = {};
   let newFormPassword = false;
   let isvisible = false;
   let idPassword = null;
   let copied = false;
-  let isLoading = true
   let showModal = false
-
-  onMount(() => {
-    async function fetchData() {
-      const notes = $listNotes;
-
-      aggregatePasswords(notes.password);
-    }
-
-    fetchData();
-    isLoading = $loadPage
-  });
-
-  const aggregatePasswords = (passwords) => {
-    const safePasswords = passwords || [];
-    let id = 0;
-    const grouped = safePasswords.reduce((acc, item) => {
-      const {password, name, url, observation} = item;
-      if (!acc[password]) {
-        acc[password] = {
-          id: ++id, 
-          password, 
-          items: [{id: item.id, name, url, observation}]
-        };
-      } else {
-        acc[password].items.push({id: item.id, name, url, observation});
-      }
-      return acc;
-    }, {});
-
-    passwordList = Object.values(grouped);
-  }
+  let submitError = ''
+  let successMsg = ''
 
   const getFormattedPassword = (password) => {
     const halfLength = Math.ceil(password.length / 2);
@@ -70,12 +43,22 @@
   }
 
   const onClickItem = (id) => {
-    if (seletecdItem === id) {
-      seletecdItem = null;
+    if (selectedItem === id) {
+      selectedItem = null;
       return;
     }
-    seletecdItem = id;
+    selectedItem = id;
   };
+
+  const handleChangeInpunt = (e) => {
+    submitError = ''
+
+    const { name, value } = e.target;
+    form = {
+      ...form,
+      [name]: value
+    }
+  }
 
   const onCancelClick = () => {
     selectedName = null;
@@ -95,12 +78,12 @@
 
   const onCancelCreateClick = () => {
     newFormPassword = false;
-    seletecdItem = null;
+    selectedItem = null;
   }
 
   const onCreateClick = (id) => {
     newFormPassword = true;
-    seletecdItem = id;
+    selectedItem = id;
   }
 
   const onAddNewClick = () => {
@@ -111,13 +94,63 @@
     idPassword = id;
     isvisible = !isvisible;
   }
+
+  const handleSaveNewPassword = async (password) => {
+    if (!form.name) {
+      submitError = 'Preencha o campo nome';
+      return;
+    }
+
+    const params = {
+      id: crypto.randomUUID(),
+      group: $selectedTab,
+      type: 'passwords',
+      name: form.name,
+      password: password,
+      url: form.url || '',
+      observation: form.observation || ''
+    }
+
+    try {
+      console.log("Tentando adicionar nota...");
+      await addNotes($selectedTab, {
+        ...params,
+        id: crypto.randomUUID(),
+      });
+
+      successMsg = 'Senha criada com sucesso';
+
+      const newList = await requestNotes($selectedTab);
+      listNotes.set(newList);
+
+      setTimeout(() => {
+        successMsg = '';
+        form = {};
+        newFormPassword = false;
+      }, 2000);
+    } catch (error) {
+      submitError = 'Erro ao criar senha';
+    }
+  }
 </script>
 
 <section>
-  {#if isLoading}
+  {#if successMsg}
+    <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-40">
+      <div class="bg-white p-5 rounded-lg">
+        <p class="text-green-600">{successMsg}</p>
+      </div>
+    </div>
+  {/if}
+
+  {#if $loadPage}
     <div class="flex justify-center items-center gap-5 py-14">
       <i class="fas fa-spinner fa-spin fa-3x text-orange-400"></i>
       <h3 class="text-orange-400">Carregando...</h3>
+    </div>
+  {:else if $listNotes.length === 0}
+    <div class="flex justify-center items-center gap-5 py-14">
+      <h3 class="text-orange-400">Nenhum resultado encontrado</h3>
     </div>
   {:else}
     {#if filteredList}
@@ -131,7 +164,7 @@
           {/if}
           {#each filteredList as item}
             <li class="border border-dashed border-neutral-800">
-              <h2>{item.name}</h2>
+              <h2>{item.name || item.serviceName}</h2>
               <div class="p-2 text-base">
                 <p>
                   <b>Login:</b>
@@ -164,8 +197,8 @@
         </ul>
       </div>
     {:else}
-      {#if $listNotes?.password}
-        <PasswordsList 
+      {#if passwordList.length}
+        <PasswordsList
           isvisible={isvisible}
           idPassword={idPassword}
           getFormattedPassword={getFormattedPassword}
@@ -181,15 +214,19 @@
           onCancelEditClick={onCancelEditClick}
           form={form}
           newForm={newFormPassword}
-          seletecdItem={seletecdItem}
+          selectedItem={selectedItem}
           onCancelCreateClick={onCancelCreateClick}
           onCreateClick={onCreateClick}
           onCancelClick={onCancelClick}
+          onSavePasswordClick={handleSaveNewPassword}
+          onChangeInpunt={handleChangeInpunt}
+          submitError={submitError}
         />
       {/if}
 
-      {#if $listNotes?.server}
+      {#if serverList.length}
         <ServersList
+          listOfServers={serverList}
           isvisible={isvisible}
           idPassword={idPassword}
           getFormattedPassword={getFormattedPassword}
@@ -199,8 +236,9 @@
         />
       {/if}
 
-      {#if $listNotes?.others}
+      {#if othersList.length}
         <OthersList
+          listOfOthers={othersList}
           isvisible={isvisible}
           idPassword={idPassword}
           getFormattedPassword={getFormattedPassword}

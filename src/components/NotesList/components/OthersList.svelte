@@ -1,6 +1,5 @@
 <script>
-  import { listNotes } from "../../../store/stores";
-
+  export let listOfOthers;
   export let isvisible;
   export let idPassword;
   export let getFormattedPassword;
@@ -12,7 +11,7 @@
 <div class="container">
   <h2>Outros</h2>
   <ul class="sub-item server">
-    {#each $listNotes.others as other}
+    {#each listOfOthers as other}
       <li class="border border-dashed border-neutral-800">
         <h2>{other.name}</h2>
         <div class="p-2 text-base">

@@ -6,7 +6,7 @@
   export let toggleVisibility;
   export let copied;
   export let copyText;
-  export let seletecdItem;
+  export let selectedItem;
   export let onClickItem;
   export let selectedName;
   export let onClickName;
@@ -18,6 +18,9 @@
   export let onCancelCreateClick;
   export let onCancelClick;
   export let form;
+  export let onSavePasswordClick;
+  export let onChangeInpunt;
+  export let submitError;
 </script>
 
 <div class="container">
@@ -38,27 +41,53 @@
           <i class="fa-solid fa-eye-slash" />
         </button>
         <button on:click={() => onClickItem(id)}>
-          <i class={`fa-solid fa-bars-staggered ${id === seletecdItem && 'text-orange-600'}`} />
+          <i class={`fa-solid fa-bars-staggered ${id === selectedItem && !newForm && 'text-orange-600'}`} />
         </button>
         <button class="icon" on:click={() => onCreateClick(id)}>
           <i class="fa-solid fa-square-plus text-emerald-700" />
         </button>
       </div>
 
-      {#if newForm && id === seletecdItem}
+      {#if newForm && id === selectedItem}
         <div class="w-full p-3">
           <div>
-            <input type="text" placeholder="Senha" value={password} />
-            <input type="text" placeholder="Nome" value={form?.name || ''} />
-            <input type="text" placeholder="Url" value={form?.url || ''} />
-            <input type="text" placeholder="Obs" value={form?.observation || ''} />
+            <input
+              type="text"
+              readonly
+              placeholder="Senha"
+              value={password}
+            />
+            <input
+              type="text"
+              name="name"
+              placeholder="Nome *"
+              value={form?.name || ''}
+              on:change={onChangeInpunt}
+            />
+            <input
+              type="text"
+              name="url"
+              placeholder="Url"
+              value={form?.url || ''}
+              on:change={onChangeInpunt}
+            />
+            <input
+              type="text"
+              name="observation"
+              placeholder="Obs"
+              value={form?.observation || ''}
+              on:change={onChangeInpunt}
+            />
+            {#if submitError}
+              <span class="text-red-600 p-3 border border-solid mt-2 border-red-600 error">{submitError}</span>
+            {/if}
           </div>
           <div class="flex justify-between pt-4">
             <button class="button cancel" on:click={() => onCancelCreateClick()}>
               <i class="fa-solid fa-xmark" />
               Cancelar
             </button>
-            <button class="button edit">
+            <button class="button edit" on:click={() => onSavePasswordClick(password)}>
               <i class="fa-solid fa-save" />
               Salvar
             </button>
@@ -66,7 +95,7 @@
         </div>
       {/if}
 
-      {#if id === seletecdItem && !newForm}
+      {#if id === selectedItem && !newForm}
         <ul class="sub-item">
           {#if selectedName && !isEdit}
             <div class="w-full p-3">
@@ -90,16 +119,16 @@
             <div class="w-full p-3">
               <div>
                 <input type="text" placeholder="Senha" value={form.password || ''} />
-                <input type="text" placeholder="Nome" value={form.name || ''} />
+                <input type="text" placeholder="Nome *" value={form.name || ''} />
                 <input type="text" placeholder="Url" value={form.url || ''} />
                 <input type="text" placeholder="Obs" value={form.observation || ''} />
               </div>
               <div class="flex justify-between pt-4">
-                <button class="button cancel" on:click={() => onCancelEditClick()}>
+                <button class="button cancel" on:click={onCancelEditClick}>
                   <i class="fa-solid fa-xmark" />
                   Fechar
                 </button>
-                <button class="button edit">
+                <button class="button edit" on:click={onEditClick}>
                   <i class="fa-solid fa-save" />
                   Salvar
                 </button>
@@ -195,6 +224,10 @@
 
   span {
     @apply w-full flex items-center text-neutral-200;
+
+    &.error {
+      @apply text-red-600;
+    }
   }
 
   input {

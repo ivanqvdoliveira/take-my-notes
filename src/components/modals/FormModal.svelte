@@ -1,13 +1,9 @@
 <script>
-  import db from '../../firebase';
-  import {
-    addDoc,
-    getDocs,
-    collection,
-  } from 'firebase/firestore';
-  import { groupCollection, typeCollection } from '../../store/stores';
+  import { selectedTab, typeCollection, listNotes } from '../../store/stores';
   import Select from "../form/Select.svelte";
   import ModalOverlay from "./ModalOverlay.svelte";
+  import { requestNotes } from '../../requests/requestNotes';
+  import { addNotes } from '../../requests/addNotes';
 
   export let onClose;
 
@@ -18,13 +14,6 @@
   let submitError = ''
   let successMessage = ''
 
-  const onGroupChange = (value, name) => {
-    form = {
-      ...form,
-      [name]: value
-    }
-  }
-
   const onTypeChange = (value, name) => {
     form = {
       ...form,
@@ -34,6 +23,7 @@
     if (value === 'server') {
       type = 'server'
       serviceList = [{
+        id: crypto.randomUUID(),
         serviceName: '',
         login: '',
         password: ''
@@ -91,6 +81,7 @@
     }
 
     const defaultServiceList = {
+      id: crypto.randomUUID(),
       serviceName: '',
       login: '',
       password: ''
@@ -112,12 +103,14 @@
   }
 
   const deliverySubmission = async (params) => {
-    await addDoc(collection(db, "my-notes"), {
+    await addNotes($selectedTab, {
       ...params,
       id: crypto.randomUUID(),
     })
-      .then(() => {
+      .then(async () => {
         successMessage = 'Nota adicionada com sucesso!'
+        const newList = await requestNotes($selectedTab)
+        listNotes.set(newList)
 
         setTimeout(() => {
           successMessage = ''
@@ -136,7 +129,6 @@
     if (
       !allFieldsFilled
       || !form?.clientName
-      || !form?.group
       || !form?.type
     ) {
       submitError = 'Preencha todos os campos requeridos com *';
@@ -144,7 +136,7 @@
     }
 
     const params = {
-      group: form.group,
+      group: $selectedTab,
       type: form.type,
       clientName: form.clientName,
       services: serviceList,
@@ -163,13 +155,13 @@
       return
     }
 
-    if (!form.group || !form.type || !form.name || !form.password) {
+    if (!form.type || !form.name || !form.password) {
       submitError = 'Preencha todos os campos requeridos com *';
       return;
     }
 
     const params ={
-      group: form.group,
+      group: $selectedTab,
       type: form.type,
       name: form.name,
       password: form.password,
@@ -204,12 +196,6 @@
           </div>
           <div class="p-3">
             <form>
-              <Select
-                name="group"
-                label="Selecione o Grupo *"
-                options={$groupCollection}
-                onChangeSelect={onGroupChange}
-              />
               <Select
                 name="type"
                 label="Selecione o Tipo *"

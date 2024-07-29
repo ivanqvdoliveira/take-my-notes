@@ -1,30 +1,26 @@
 <script>
-  import { groupTabMock } from "../../mocks/groupTabMock";
-  import { selectedTab, listNotes, searchValue } from "../../store/stores";
-  import { notesMock } from "../../mocks/notesMock";
+  import {
+    selectedTab,
+    searchValue,
+    groupCollection,
+    loadPage
+  } from "../../store/stores";
 
   export let tabHasChanged;
 
-  const onButtonClick = (id) => {
-    selectedTab.set(id);
-    tabHasChanged()
+  const onButtonClick = (value) => {
+    loadPage.set(true);
+    selectedTab.set(value);
+    tabHasChanged(value)
     searchValue.set('')
-
-    const list = notesMock.find(elem => elem.id === id);
-
-    if (list) {
-      listNotes.set(list);
-    } else {
-      console.error('Nenhum elemento encontrado');
-    }
   };
 </script>
 
 <section class="flex pb-5 gap-4">
-  {#each groupTabMock as { label, id }}
+  {#each $groupCollection as { label, value }}
     <button
-      class={$selectedTab === id && 'active'}
-      on:click={() => onButtonClick(id)}
+      class={$selectedTab === value && 'active'}
+      on:click={() => onButtonClick(value)}
     >
       {label}
     </button>
