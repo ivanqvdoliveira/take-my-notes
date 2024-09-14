@@ -6,6 +6,7 @@
   export let toggleVisibility;
   export let copied;
   export let copyText;
+  export let onEditClick;
 </script>
 
 <div class="container">
@@ -16,6 +17,9 @@
     <div class="p-2">
       <div class="item-container">
         <span>{clientName}</span>
+        <button class="button edit" on:click={() => onEditClick(clientName, observation, services)}>
+          <i class="fa-regular fa-pen-to-square" />
+        </button>
       </div>
       {#if services}
         <ul class="sub-item server">

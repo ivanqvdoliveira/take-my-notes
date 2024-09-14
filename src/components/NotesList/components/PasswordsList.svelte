@@ -21,6 +21,7 @@
   export let onSavePasswordClick;
   export let onChangeInpunt;
   export let submitError;
+  export let onSaveEditClick;
 </script>
 
 <div class="container">
@@ -118,17 +119,41 @@
           {:else if selectedName && isEdit}
             <div class="w-full p-3">
               <div>
-                <input type="text" placeholder="Senha" value={form.password || ''} />
-                <input type="text" placeholder="Nome *" value={form.name || ''} />
-                <input type="text" placeholder="Url" value={form.url || ''} />
-                <input type="text" placeholder="Obs" value={form.observation || ''} />
+                <input
+                  type="text"
+                  name="password"
+                  placeholder="Senha"
+                  value={form.password || ''}
+                  on:change={onChangeInpunt}
+                />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Nome *"
+                  value={form.name || ''}
+                  on:change={onChangeInpunt}
+                />
+                <input
+                  type="text"
+                  name="url"
+                  placeholder="Url"
+                  value={form.url || ''}
+                  on:change={onChangeInpunt}
+                />
+                <input
+                  type="text"
+                  name="observation"
+                  placeholder="Obs"
+                  value={form.observation || ''}
+                  on:change={onChangeInpunt}
+                />
               </div>
               <div class="flex justify-between pt-4">
                 <button class="button cancel" on:click={onCancelEditClick}>
                   <i class="fa-solid fa-xmark" />
                   Fechar
                 </button>
-                <button class="button edit" on:click={onEditClick}>
+                <button class="button edit" on:click={onSaveEditClick}>
                   <i class="fa-solid fa-save" />
                   Salvar
                 </button>

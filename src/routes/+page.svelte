@@ -48,15 +48,15 @@
     const safePasswords = passwords || [];
     let id = 0;
     const grouped = safePasswords.reduce((acc, item) => {
-      const {password, name, url, observation} = item;
+      const {password} = item;
       if (!acc[password]) {
         acc[password] = {
           id: ++id, 
           password, 
-          items: [{id: item.id, name, url, observation}]
+          items: [{id: item.id, ...item}]
         };
       } else {
-        acc[password].items.push({id: item.id, name, url, observation});
+        acc[password].items.push({id: item.id, ...item});
       }
       return acc;
     }, {});

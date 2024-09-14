@@ -5,7 +5,7 @@ export const requestNotes = async (path) => {
   const list = []
   const querySnapshot = await getDocs(collection(db, path));
   querySnapshot.forEach((doc) => {
-    list.push({ id: doc.id, ...doc.data() });
+    list.push({ docId: doc.id, ...doc.data() });
   });
 
   return list

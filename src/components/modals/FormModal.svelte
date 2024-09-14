@@ -4,8 +4,10 @@
   import ModalOverlay from "./ModalOverlay.svelte";
   import { requestNotes } from '../../requests/requestNotes';
   import { addNotes } from '../../requests/addNotes';
+  import { onMount } from 'svelte';
 
   export let onClose;
+  export let editServer;
 
   let form = {}
   let serviceList = []
@@ -13,6 +15,22 @@
   let serviceError = ''
   let submitError = ''
   let successMessage = ''
+
+  onMount(async () => {
+    if (editServer.isEdit) {
+      form = {
+        ...editServer.form,
+        type: 'server'
+      }
+
+      if (editServer?.form?.services) {
+        serviceList = editServer.form.services
+      }
+
+      console.log('editServer', editServer)
+      type = 'server'
+    }
+  })
 
   const onTypeChange = (value, name) => {
     form = {
@@ -58,7 +76,14 @@
       serviceList: newArray
     }
     serviceList = newArray
+  }
 
+  const renderTypeLabel = (type) => {
+    if (type === 'server') {
+      return 'Servidor'
+    }
+
+    return 'Selecione o Tipo *'
   }
 
   const onCancelEditClick = (e) => {
@@ -176,7 +201,7 @@
 </script>
 
 <ModalOverlay>
-  <div id="form-modal" data-modal-show="form-modal" tabindex="-1" class="">
+  <div id="form-modal" data-modal-show="form-modal" tabindex="-1" class="form-modal">
     {#if successMessage}
       <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
         <div class="bg-white p-5 rounded-lg">
@@ -184,7 +209,7 @@
         </div>
       </div>
     {:else}
-      <div class="relative p-4 w-full max-w-md max-h-full">
+      <div class="modal-container">
         <div class="relative rounded-lg shadow bg-zinc-800">
           <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-orange-600 text-center text-orange-600">
             <h3 class="w-full text-xl font-semibold">
@@ -198,9 +223,10 @@
             <form>
               <Select
                 name="type"
-                label="Selecione o Tipo *"
+                label={renderTypeLabel(editServer.type)}
                 options={$typeCollection}
                 onChangeSelect={onTypeChange}
+                isEdit={editServer.isEdit}
               />
 
               {#if type === 'server'}
@@ -365,5 +391,14 @@
     border-bottom: 1px solid;
     border-radius: 4px 4px 0 0;
     @apply border-neutral-600;
+  }
+
+  .form-modal {
+    @apply overflow-y-auto;
+    max-height: calc(100% - 30px);
+  }
+
+  .modal-container {
+    @apply relative w-full max-w-md max-h-screen;
   }
 </style>

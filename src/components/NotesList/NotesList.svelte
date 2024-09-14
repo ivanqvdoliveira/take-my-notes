@@ -7,6 +7,7 @@
   import FormModal from '../modals/FormModal.svelte';
   import { addNotes } from '../../requests/addNotes';
   import { requestNotes } from '../../requests/requestNotes';
+  import { updateNotes } from '../../requests/updateNotes';
   export let selectedItem = null;
   export let filteredList;
   export let passwordList;
@@ -21,6 +22,7 @@
   let copied = false;
   let showModal = false
   let submitError = ''
+  let editServer = {isEdit: false}
   let successMsg = ''
 
   const getFormattedPassword = (password) => {
@@ -95,6 +97,35 @@
     isvisible = !isvisible;
   }
 
+  const updateBeforeChange = async () => {
+    const newList = await requestNotes($selectedTab);
+    listNotes.set(newList);
+
+    setTimeout(() => {
+      successMsg = '';
+      form = {};
+      newFormPassword = false;
+      selectedName = null;
+      selectedItem = null;
+      isEdit = false;
+      idPassword = null;
+      isvisible = false;
+    }, 2000);
+  }
+
+  const onEditServerClick = (clientName, observation, services) => {
+    editServer = {
+      form: {
+        clientName,
+        observation,
+        services,
+      },
+      type: 'server',
+      isEdit: true
+    }
+    showModal = true;
+  }
+
   const handleSaveNewPassword = async (password) => {
     if (!form.name) {
       submitError = 'Preencha o campo nome';
@@ -112,7 +143,6 @@
     }
 
     try {
-      console.log("Tentando adicionar nota...");
       await addNotes($selectedTab, {
         ...params,
         id: crypto.randomUUID(),
@@ -120,16 +150,21 @@
 
       successMsg = 'Senha criada com sucesso';
 
-      const newList = await requestNotes($selectedTab);
-      listNotes.set(newList);
-
-      setTimeout(() => {
-        successMsg = '';
-        form = {};
-        newFormPassword = false;
-      }, 2000);
+      updateBeforeChange()
     } catch (error) {
       submitError = 'Erro ao criar senha';
+    }
+  }
+
+  const onSaveEditClick = async () => {
+    try {
+      await updateNotes($selectedTab, form);
+
+      successMsg = 'Senha editada com sucesso';
+
+      updateBeforeChange()
+    } catch (error) {
+      submitError = 'Erro ao editar senha';
     }
   }
 </script>
@@ -221,6 +256,7 @@
           onSavePasswordClick={handleSaveNewPassword}
           onChangeInpunt={handleChangeInpunt}
           submitError={submitError}
+          onSaveEditClick={onSaveEditClick}
         />
       {/if}
 
@@ -233,6 +269,7 @@
           toggleVisibility={toggleVisibility}
           copied={copied}
           copyText={copyText}
+          onEditClick={onEditServerClick}
         />
       {/if}
 
@@ -255,6 +292,7 @@
   {#if showModal}
     <FormModal
       onClose={() => showModal = false}
+      editServer={editServer}
     />
   {/if}
 </section>

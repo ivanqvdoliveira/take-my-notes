@@ -30,6 +30,10 @@ body {
 	color: #ffffff;
 }
 
+*::-webkit-scrollbar {
+  display: none;
+}
+
 h1,
 h2,
 p {
