@@ -24,6 +24,7 @@
   let submitError = ''
   let editServer = {isEdit: false}
   let successMsg = ''
+  let isEditOrder = {};
 
   const getFormattedPassword = (password) => {
     const halfLength = Math.ceil(password.length / 2);
@@ -110,6 +111,7 @@
       isEdit = false;
       idPassword = null;
       isvisible = false;
+      isEditOrder = {};
     }, 2000);
   }
 
@@ -124,6 +126,56 @@
       isEdit: true
     }
     showModal = true;
+  }
+
+  const onEditOtherClick = (other) => {
+    isEditOrder = {
+      status: true,
+      other
+    }
+    form = {
+      name: other.name,
+      password: other.password,
+      login: other.login,
+      url: other.url,
+      observation: other.observation
+    }
+  }
+
+  const handleChangeOthers = (e) => {
+    submitError = ''
+
+    const { name, value } = e.target;
+    form = {
+      ...form,
+      [name]: value
+    }
+  }
+
+  const handleCloseOthers = () => {
+    isEditOrder = {};
+  }
+
+  const handleSaveOthers = async (other) => {
+    if (!form.name || !form.password) {
+      submitError = 'Preencha os campos Nome e Senha';
+      return;
+    }
+    
+    const params = {
+      ...other,
+      ...form
+    }
+
+    try {
+      await updateNotes($selectedTab, params);
+
+      successMsg = 'Outros Editado com Sucesso';
+
+      updateBeforeChange()
+    } catch (error) {
+      submitError = 'Erro ao editar outros';
+    }
   }
 
   const handleSaveNewPassword = async (password) => {
@@ -171,7 +223,7 @@
 
 <section>
   {#if successMsg}
-    <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-40">
+    <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-40">
       <div class="bg-white p-5 rounded-lg">
         <p class="text-green-600">{successMsg}</p>
       </div>
@@ -282,6 +334,12 @@
           toggleVisibility={toggleVisibility}
           copied={copied}
           copyText={copyText}
+          onEditClick={onEditOtherClick}
+          isEditOrder={isEditOrder}
+          onFormChange={handleChangeOthers}
+          onClose={handleCloseOthers}
+          onSaveOthersClick={handleSaveOthers}
+          form={form}
         />
       {/if}
     {/if}
