@@ -11,6 +11,8 @@
   export let onFormChange
   export let onClose
   export let onSaveOthersClick
+  export let form
+  export let onDeleteClick
 </script>
 
 <div class="container">
@@ -24,9 +26,8 @@
               <input
                 type="text"
                 name="name"
-                bind:value={other.name}
+                bind:value={form.name}
                 placeholder="Nome *"
-                on:change={onFormChange}
                 on:change={onFormChange}
               />
             </div>
@@ -34,28 +35,28 @@
               <input
                 type="text"
                 name="password"
-                bind:value={other.password}
+                bind:value={form.password}
                 placeholder="Senha *"
                 on:change={onFormChange}
               />
               <input
                 type="text"
                 name="login"
-                bind:value={other.login}
+                bind:value={form.login}
                 placeholder="Login"
                 on:change={onFormChange}
               />
               <input
                 type="text"
                 name="url"
-                bind:value={other.url}
+                bind:value={form.url}
                 placeholder="Url"
                 on:change={onFormChange}
               />
               <textarea
                 placeholder="Observações"
                 name="observation"
-                bind:value={other.observation}
+                bind:value={form.observation}
                 class="mb-0"
                 on:change={onFormChange}
               />
@@ -64,6 +65,9 @@
               <button class="button cancel" on:click={() => onClose()}>
                 <i class="fa-solid fa-xmark" />
                 Cancelar
+              </button>
+              <button class="button delete" on:click={() => onDeleteClick(other.docId)}>
+                <i class="fa-regular fa-trash-can" />
               </button>
               <button class="button edit" on:click={() => onSaveOthersClick(other)}>
                 <i class="fa-solid fa-save" />
@@ -141,6 +145,15 @@
 
       &.cancel {
         @apply bg-red-600 hover:bg-red-800;
+      }
+
+      &.delete {
+        @apply w-9 h-9;
+
+        i {
+          @apply hover:text-red-600;
+          font-size: 1.2rem;
+        }
       }
 
       &.edit {

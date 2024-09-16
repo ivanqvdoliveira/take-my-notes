@@ -55,7 +55,7 @@
         window.location.href = "/login";
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 </script>

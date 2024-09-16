@@ -8,6 +8,7 @@
   import { addNotes } from '../../requests/addNotes';
   import { requestNotes } from '../../requests/requestNotes';
   import { updateNotes } from '../../requests/updateNotes';
+  import { deleteNote } from '../../requests/deleteNote';
   export let selectedItem = null;
   export let filteredList;
   export let passwordList;
@@ -101,6 +102,7 @@
   const updateBeforeChange = async () => {
     const newList = await requestNotes($selectedTab);
     listNotes.set(newList);
+    showModal = false;
 
     setTimeout(() => {
       successMsg = '';
@@ -115,13 +117,14 @@
     }, 2000);
   }
 
-  const onEditServerClick = (clientName, observation, services) => {
+  const onEditServerClick = (clientName, observation, services, docId) => {
     editServer = {
       form: {
         clientName,
         observation,
         services,
       },
+      docId,
       type: 'server',
       isEdit: true
     }
@@ -219,6 +222,32 @@
       submitError = 'Erro ao editar senha';
     }
   }
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteNote($selectedTab, id);
+
+      successMsg = 'Senha deletada com sucesso';
+
+      updateBeforeChange()
+    } catch (error) {
+      submitError = 'Erro ao deletar senha';
+    }
+  }
+
+  const onDeleteClick = async (id) => {
+    if(confirm('Deseja realmente deletar essa senha?')) {
+      handleDelete(id)
+      return;
+    }
+  }
+
+  const handleDeleteServer = async () => {
+    if(confirm('Deseja realmente deletar esse servidor?')) {
+      handleDelete(editServer.docId)
+      return;
+    }
+  }
 </script>
 
 <section>
@@ -309,6 +338,7 @@
           onChangeInpunt={handleChangeInpunt}
           submitError={submitError}
           onSaveEditClick={onSaveEditClick}
+          onDeleteClick={onDeleteClick}
         />
       {/if}
 
@@ -340,6 +370,7 @@
           onClose={handleCloseOthers}
           onSaveOthersClick={handleSaveOthers}
           form={form}
+          onDeleteClick={onDeleteClick}
         />
       {/if}
     {/if}
@@ -351,6 +382,7 @@
     <FormModal
       onClose={() => showModal = false}
       editServer={editServer}
+      onDeleteClick={handleDeleteServer}
     />
   {/if}
 </section>

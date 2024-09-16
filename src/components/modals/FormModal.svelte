@@ -8,6 +8,7 @@
 
   export let onClose;
   export let editServer;
+  export let onDeleteClick;
 
   let form = {}
   let serviceList = []
@@ -27,7 +28,6 @@
         serviceList = editServer.form.services
       }
 
-      console.log('editServer', editServer)
       type = 'server'
     }
   })
@@ -98,7 +98,12 @@
     if (serviceList.length > 0) {
       const lastService = serviceList[serviceList.length - 1];
 
-      const allFieldsFilled = Object.values(lastService).every(value => value.trim() !== '');
+      const allFieldsFilled = Object.values(lastService).every(value => {
+        if (typeof value === 'string') {
+          return value.trim() !== '';
+        }
+        return String(value).trim() !== '';
+      });
       if (!allFieldsFilled || !form?.clientName) {
         serviceError = 'Preencha todos os campos do serviço requeridos com *';
         return;
@@ -345,6 +350,11 @@
               <i class="fa-solid fa-xmark" />
               Cancelar
             </button>
+            {#if editServer.isEdit}
+              <button class="button delete" on:click={() => onDeleteClick()}>
+                <i class="fa-regular fa-trash-can" />
+              </button>
+            {/if}
             <button class="button edit" on:click={handleSubmit}>
               <i class="fa-solid fa-save" />
               Salvar
@@ -361,6 +371,15 @@
   button {
     i {
       font-size: 1.5rem
+    }
+
+    &.delete {
+      @apply w-9 h-9;
+
+      i {
+        @apply hover:text-red-600;
+        font-size: 1.2rem;
+      }
     }
 
     &.button {

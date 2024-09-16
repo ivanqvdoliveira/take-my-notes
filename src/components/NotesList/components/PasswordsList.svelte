@@ -22,6 +22,7 @@
   export let onChangeInpunt;
   export let submitError;
   export let onSaveEditClick;
+  export let onDeleteClick;
 </script>
 
 <div class="container">
@@ -109,6 +110,9 @@
                 <button class="button cancel" on:click={() => onCancelClick()}>
                   <i class="fa-solid fa-xmark" />
                   Fechar
+                </button>
+                <button class="button delete" on:click={() => onDeleteClick(selectedName.docId)}>
+                  <i class="fa-regular fa-trash-can" />
                 </button>
                 <button class="button edit" on:click={() => onEditClick(password)}>
                   <i class="fa-regular fa-pen-to-square" />
@@ -207,6 +211,15 @@
 
       &.cancel {
         @apply bg-red-600 hover:bg-red-800;
+      }
+
+      &.delete {
+        @apply w-9 h-9;
+
+        i {
+          @apply hover:text-red-600;
+          font-size: 1.2rem;
+        }
       }
 
       &.edit {

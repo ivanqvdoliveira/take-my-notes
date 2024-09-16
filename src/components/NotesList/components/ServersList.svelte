@@ -12,12 +12,17 @@
 <div class="container">
   <h2>Servidores</h2>
   {#each listOfServers as {
-    clientName, observation, services
+    clientName, observation, services, docId
   }}
     <div class="p-2">
       <div class="item-container">
         <span>{clientName}</span>
-        <button class="button edit" on:click={() => onEditClick(clientName, observation, services)}>
+        <button class="button edit" on:click={() => onEditClick(
+          clientName,
+          observation,
+          services,
+          docId
+        )}>
           <i class="fa-regular fa-pen-to-square" />
         </button>
       </div>
