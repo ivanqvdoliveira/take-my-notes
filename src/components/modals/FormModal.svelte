@@ -147,9 +147,7 @@
           form = {}
           onClose()
         }, 2000)
-      })
-    ;
-
+      });
   }
 
   const onSubmitByServer = () => {

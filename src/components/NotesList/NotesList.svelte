@@ -9,11 +9,13 @@
   import { requestNotes } from '../../requests/requestNotes';
   import { updateNotes } from '../../requests/updateNotes';
   import { deleteNote } from '../../requests/deleteNote';
+
   export let selectedItem = null;
   export let filteredList;
   export let passwordList;
   export let serverList;
   export let othersList;
+
   let selectedName = null;
   let isEdit = false;
   let form = {};
@@ -227,7 +229,7 @@
     try {
       await deleteNote($selectedTab, id);
 
-      successMsg = 'Senha deletada com sucesso';
+      successMsg = 'Nota deletada com sucesso';
 
       updateBeforeChange()
     } catch (error) {
@@ -236,15 +238,8 @@
   }
 
   const onDeleteClick = async (id) => {
-    if(confirm('Deseja realmente deletar essa senha?')) {
+    if(confirm('Deseja realmente deletar essa anotação?')) {
       handleDelete(id)
-      return;
-    }
-  }
-
-  const handleDeleteServer = async () => {
-    if(confirm('Deseja realmente deletar esse servidor?')) {
-      handleDelete(editServer.docId)
       return;
     }
   }
@@ -382,7 +377,7 @@
     <FormModal
       onClose={() => showModal = false}
       editServer={editServer}
-      onDeleteClick={handleDeleteServer}
+      onDeleteClick={() => onDeleteClick(editServer.docId)}
     />
   {/if}
 </section>

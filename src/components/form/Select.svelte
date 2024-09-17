@@ -38,9 +38,6 @@
       {#each options as item}
         <button on:click={(e) => handleSelect(e, item, name)} class="w-full text-left px-5 py-3 bg-zinc-800" value={item.value}>{item.label}</button>
       {/each}
-      <!-- {#if options.length <= 2}
-        <button class="w-full text-left px-5 py-3 bg-zinc-800">+ Adicionar</button>
-      {/if} -->
     </div>
   {/if}
 </div>
