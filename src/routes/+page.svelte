@@ -1,13 +1,14 @@
 <script>
   import { onMount } from 'svelte';
   import { derived } from 'svelte/store';
-  import { listNotes, loadPage } from "../store/stores";
+  import { listNotes, loadPage, isLoading } from "../store/stores";
   import GroupTab from "../components/GroupTab/GroupTab.svelte";
   import NotesList from "../components/NotesList/NotesList.svelte";
   import SearchSection from "../components/SearchSection/SearchSection.svelte";
   import { requestNotes } from '../requests/requestNotes'
 
   export let filteredList = '';
+
   let passwordList = [];
   let notFilteredPasswordList = [];
   let serverList = [];
@@ -128,12 +129,42 @@
 </svelte:head>
 
 <section>
-	<GroupTab tabHasChanged={tabHasChanged} />
-  <SearchSection onChangeSearch={onChangeSearch} />
-  <NotesList
-    filteredList={filteredList}
-    passwordList={passwordList}
-    serverList={serverList}
-    othersList={othersList}
-  />
+  {#if $isLoading}
+    <div class="loading-container">
+      <div class="loader">
+        <i class="fa-solid fa-spinner"></i>
+      </div>
+    </div>
+  {:else}
+    <GroupTab tabHasChanged={tabHasChanged} />
+    <SearchSection onChangeSearch={onChangeSearch} />
+    <NotesList
+      filteredList={filteredList}
+      passwordList={passwordList}
+      serverList={serverList}
+      othersList={othersList}
+    />
+  {/if}
 </section>
+
+<style lang="scss">
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+      @apply text-gray-50;
+    }
+    100% {
+      transform: rotate(360deg);
+      @apply text-orange-500;
+    }
+  }
+
+  .loading-container {
+    @apply flex justify-center items-center h-screen w-screen bg-black bg-opacity-50 fixed top-0 left-0;
+
+    .loader {
+      font-size: 50px;
+      animation: spin 2s linear infinite;
+    }
+  }
+</style>

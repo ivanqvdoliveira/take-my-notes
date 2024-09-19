@@ -6,3 +6,4 @@ export const searchValue = writable('');
 export const loadPage = writable(false);
 export const groupCollection = writable([]);
 export const typeCollection = writable([]);
+export const isLoading = writable(true);

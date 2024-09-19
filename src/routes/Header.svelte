@@ -4,7 +4,12 @@
   import { getDocs, collection } from "firebase/firestore";
   import { app } from "../firebase";
   import { onMount } from "svelte";
-  import { loadPage, groupCollection, typeCollection, selectedTab } from "../store/stores";
+  import {
+    loadPage,
+    groupCollection,
+    typeCollection,
+    selectedTab
+  } from "../store/stores";
 
   let url = "/";
 
@@ -14,6 +19,7 @@
       url = window.location.pathname;
       const login = "/login";
 
+      console.log(auth)
       if (auth.currentUser && url === login) {
         loadPage.set(false);
         window.location.href = "/";
