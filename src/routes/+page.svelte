@@ -128,7 +128,7 @@
   <meta name="description" content="Tela de visualização das anotações" />
 </svelte:head>
 
-<section>
+<section class="pb-20">
   {#if $isLoading}
     <div class="loading-container">
       <div class="loader">

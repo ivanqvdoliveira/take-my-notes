@@ -4,7 +4,8 @@
   import ServersList from './components/ServersList.svelte';
   import PasswordsList from './components/PasswordsList.svelte';
   import CreateFloatingButton from '../CreateFloatingButton/CreateFloatingButton.svelte';
-  import FormModal from '../modals/FormModal.svelte';
+  import FormModal from '../modals/FormModal.svelte';  
+  import { v4 as uuidv4 } from "uuid";
   import { addNotes } from '../../requests/addNotes';
   import { requestNotes } from '../../requests/requestNotes';
   import { updateNotes } from '../../requests/updateNotes';
@@ -28,6 +29,8 @@
   let editServer = {isEdit: false}
   let successMsg = ''
   let isEditOrder = {};
+
+  const noteId = uuidv4();
 
   const getFormattedPassword = (password) => {
     const halfLength = Math.ceil(password.length / 2);
@@ -190,7 +193,7 @@
     }
 
     const params = {
-      id: crypto.randomUUID(),
+      id: noteId,
       group: $selectedTab,
       type: 'passwords',
       name: form.name,
@@ -202,7 +205,7 @@
     try {
       await addNotes($selectedTab, {
         ...params,
-        id: crypto.randomUUID(),
+        id: noteId,
       });
 
       successMsg = 'Senha criada com sucesso';

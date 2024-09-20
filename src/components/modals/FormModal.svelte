@@ -2,6 +2,7 @@
   import { selectedTab, typeCollection, listNotes } from '../../store/stores';
   import Select from "../form/Select.svelte";
   import ModalOverlay from "./ModalOverlay.svelte";
+  import { v4 as uuidv4 } from "uuid";
   import { requestNotes } from '../../requests/requestNotes';
   import { addNotes } from '../../requests/addNotes';
   import { onMount } from 'svelte';
@@ -16,6 +17,8 @@
   let serviceError = ''
   let submitError = ''
   let successMessage = ''
+
+  const noteId = uuidv4();
 
   onMount(async () => {
     if (editServer.isEdit) {
@@ -41,7 +44,7 @@
     if (value === 'server') {
       type = 'server'
       serviceList = [{
-        id: crypto.randomUUID(),
+        id: noteId,
         serviceName: '',
         login: '',
         password: ''
@@ -111,7 +114,7 @@
     }
 
     const defaultServiceList = {
-      id: crypto.randomUUID(),
+      id: noteId,
       serviceName: '',
       login: '',
       password: ''
@@ -135,7 +138,7 @@
   const deliverySubmission = async (params) => {
     await addNotes($selectedTab, {
       ...params,
-      id: crypto.randomUUID(),
+      id: noteId,
     })
       .then(async () => {
         successMessage = 'Nota adicionada com sucesso!'

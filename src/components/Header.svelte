@@ -21,8 +21,6 @@
       const login = "/login";
       isLoading.set(false);
 
-      console.log("user", user);
-
       if (user && url === login) {
         loadPage.set(false);
         window.location.href = "/";
