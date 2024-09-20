@@ -110,9 +110,9 @@
             <div class="w-full p-3">
               <div class="text-base">
                 <p><b>Nome:</b> {selectedName.name}</p>
-                <p><b>Login:</b> {selectedName.login}</p>
-                <p><b>Url:</b> {selectedName.url}</p>
-                <p><b>Obs:</b> {selectedName.observation}</p>
+                <p><b>Login:</b> {selectedName.login || ''}</p>
+                <p><b>Url:</b> {selectedName.url || ''}</p>
+                <p><b>Obs:</b> {selectedName.observation || ''}</p>
               </div>
               <div class="flex justify-between pt-4">
                 <button class="button cancel" on:click={() => onCancelClick()}>
@@ -210,7 +210,7 @@
 
     &.pass-item {
       display: inline-block;
-      @apply text-neutral-200 hover:bg-neutral-500 rounded px-2 py-1 border border-solid border-neutral-600;
+      @apply text-neutral-200 hover:bg-neutral-500 rounded px-2 py-1 border border-solid border-neutral-500;
     }
 
     i {
