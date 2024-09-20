@@ -4,7 +4,8 @@
   import ServersList from './components/ServersList.svelte';
   import PasswordsList from './components/PasswordsList.svelte';
   import CreateFloatingButton from '../CreateFloatingButton/CreateFloatingButton.svelte';
-  import FormModal from '../modals/FormModal.svelte';  
+  import FormModal from '../modals/FormModal.svelte';
+  import { copyToClipboard } from '../../utils/copyToClipboard';
   import { v4 as uuidv4 } from "uuid";
   import { addNotes } from '../../requests/addNotes';
   import { requestNotes } from '../../requests/requestNotes';
@@ -37,14 +38,29 @@
     return password.substring(0, halfLength) + '*'.repeat(password.length - halfLength);
   }
 
+  const onCloseModal = () => {
+    showModal = false;
+    form = {};
+    editServer = {isEdit: false}
+    isEditOrder = {};
+    idPassword = null;
+    selectedName = null;
+    selectedItem = null;
+  }
+
   const copyText = (text, id) => {
-    navigator.clipboard.writeText(text);
-    copied = true;
-    idPassword = id
-    setTimeout(() => {
-      copied = false;
-      idPassword = null;
-    }, 2000);
+    copyToClipboard(text)
+      .then(() => {
+        copied = true;
+        idPassword = id
+        setTimeout(() => {
+          copied = false;
+          idPassword = null;
+        }, 2000);
+      })
+      .catch(() => {
+        alert('Erro ao copiar texto');
+      });
   }
 
   const onClickName = (item) => {
@@ -52,6 +68,7 @@
   }
 
   const onClickItem = (id) => {
+    selectedName = null;
     if (selectedItem === id) {
       selectedItem = null;
       return;
@@ -91,6 +108,11 @@
   }
 
   const onCreateClick = (id) => {
+    if (id === selectedItem) {
+      selectedItem = null;
+      newFormPassword = false;
+      return;
+    }
     newFormPassword = true;
     selectedItem = id;
   }
@@ -378,7 +400,7 @@
 
   {#if showModal}
     <FormModal
-      onClose={() => showModal = false}
+      onClose={onCloseModal}
       editServer={editServer}
       onDeleteClick={() => onDeleteClick(editServer.docId)}
     />

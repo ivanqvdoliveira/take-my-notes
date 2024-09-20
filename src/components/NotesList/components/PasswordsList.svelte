@@ -68,16 +68,23 @@
             />
             <input
               type="text"
+              name="login"
+              placeholder="Login"
+              value={form?.login || ''}
+              on:change={onChangeInpunt}
+            />
+            <input
+              type="text"
               name="url"
               placeholder="Url"
               value={form?.url || ''}
               on:change={onChangeInpunt}
             />
-            <input
-              type="text"
+            <textarea
+              placeholder="Observações"
               name="observation"
-              placeholder="Obs"
-              value={form?.observation || ''}
+              value={form.observation || ''}
+              class="mb-0"
               on:change={onChangeInpunt}
             />
             {#if submitError}
@@ -103,6 +110,7 @@
             <div class="w-full p-3">
               <div class="text-base">
                 <p><b>Nome:</b> {selectedName.name}</p>
+                <p><b>Login:</b> {selectedName.login}</p>
                 <p><b>Url:</b> {selectedName.url}</p>
                 <p><b>Obs:</b> {selectedName.observation}</p>
               </div>
@@ -139,16 +147,23 @@
                 />
                 <input
                   type="text"
+                  name="login"
+                  placeholder="Login"
+                  value={form?.login || ''}
+                  on:change={onChangeInpunt}
+                />
+                <input
+                  type="text"
                   name="url"
                   placeholder="Url"
                   value={form.url || ''}
                   on:change={onChangeInpunt}
                 />
-                <input
-                  type="text"
+                <textarea
+                  placeholder="Observações"
                   name="observation"
-                  placeholder="Obs"
                   value={form.observation || ''}
+                  class="mb-0"
                   on:change={onChangeInpunt}
                 />
               </div>
@@ -195,7 +210,7 @@
 
     &.pass-item {
       display: inline-block;
-      @apply text-neutral-200 hover:bg-neutral-500 rounded p-2;
+      @apply text-neutral-200 hover:bg-neutral-500 rounded px-2 py-1 border border-solid border-neutral-600;
     }
 
     i {
@@ -257,7 +272,7 @@
   }
 
   .sub-item {
-    @apply border border-solid border-neutral-600 p-2 text-neutral-300 bg-neutral-600 text-[13px] flex flex-wrap gap-2;
+    @apply border border-solid border-neutral-600 py-2 px-1 text-neutral-300 bg-neutral-600 text-[13px] flex flex-wrap gap-1 justify-around;
   }
 
   span {
@@ -268,7 +283,7 @@
     }
   }
 
-  input {
+  input, textarea {
     @apply w-full p-2 border border-solid border-neutral-600 bg-neutral-700 text-neutral-300 rounded mb-2;
   }
 </style>
