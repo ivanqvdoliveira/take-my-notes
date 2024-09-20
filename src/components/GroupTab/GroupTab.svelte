@@ -18,12 +18,18 @@
 
 <section class="flex pb-5 gap-4">
   {#each $groupCollection as { label, value }}
-    <button
-      class={$selectedTab === value && 'active'}
-      on:click={() => onButtonClick(value)}
-    >
-      {label}
-    </button>
+    {#if $loadPage}
+      <div class="fake-button">
+        <i class="fa-solid fa-spinner loader" />
+      </div>
+    {:else}
+      <button
+        class={$selectedTab === value && 'active'}
+        on:click={() => onButtonClick(value)}
+      >
+        {label}
+      </button>
+    {/if}
   {/each}
 </section>
 
@@ -42,8 +48,23 @@
     @apply text-neutral-300;
   }
 
+  .fake-button {
+    @apply bg-transparent;
+    border-radius: 10px 10px 0 0;
+    line-height: 1.5;
+    padding: 0.5rem 1rem;
+    border-bottom: 2px solid transparent;
+    min-width: 90px;
+    text-align: center;
+  }
+
   button:hover {
     @apply bg-neutral-700;
+  }
+
+  .loader {
+    font-size: 1rem;
+    animation: spin 2s linear infinite;
   }
 
   button.active {

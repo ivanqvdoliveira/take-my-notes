@@ -34,7 +34,7 @@
     </button>
   </div>
   {#if showOptions}
-    <div class="grid grid-cols-1 gap-[1px] w-full bg-zinc-700 border border-solid border-zinc-700 rounded absolute top-full left-0 shadow-md z-50">
+    <div class="grid grid-cols-1 gap-[1px] w-full bg-zinc-700 border border-solid border-zinc-700 rounded absolute top-full left-0 shadow-md z-">
       {#each options as item}
         <button on:click={(e) => handleSelect(e, item, name)} class="w-full text-left px-5 py-3 bg-zinc-800" value={item.value}>{item.label}</button>
       {/each}

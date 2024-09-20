@@ -132,7 +132,7 @@
   {#if $isLoading}
     <div class="loading-container">
       <div class="loader">
-        <i class="fa-solid fa-spinner"></i>
+        <i class="fa-solid fa-spinner" />
       </div>
     </div>
   {:else}
@@ -148,17 +148,6 @@
 </section>
 
 <style lang="scss">
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-      @apply text-gray-50;
-    }
-    100% {
-      transform: rotate(360deg);
-      @apply text-orange-500;
-    }
-  }
-
   .loading-container {
     @apply flex justify-center items-center h-screen w-screen bg-black bg-opacity-50 fixed top-0 left-0;
 

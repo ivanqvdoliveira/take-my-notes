@@ -8,7 +8,8 @@
     loadPage,
     groupCollection,
     typeCollection,
-    selectedTab
+    selectedTab,
+    isLoading,
   } from "../store/stores";
 
   let url = "/";
@@ -18,9 +19,11 @@
     onAuthStateChanged(auth, (user) => {
       url = window.location.pathname;
       const login = "/login";
+      isLoading.set(false);
 
-      console.log(auth)
-      if (auth.currentUser && url === login) {
+      console.log("user", user);
+
+      if (user && url === login) {
         loadPage.set(false);
         window.location.href = "/";
       } else if (!user && url !== login) {
