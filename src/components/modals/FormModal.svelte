@@ -18,8 +18,6 @@
   let submitError = ''
   let successMessage = ''
 
-  const noteId = uuidv4();
-
   onMount(async () => {
     if (editServer.isEdit) {
       form = {
@@ -44,7 +42,7 @@
     if (value === 'server') {
       type = 'server'
       serviceList = [{
-        id: noteId,
+        id: uuidv4(),
         serviceName: '',
         login: '',
         password: ''
@@ -114,7 +112,7 @@
     }
 
     const defaultServiceList = {
-      id: noteId,
+      id: uuidv4(),
       serviceName: '',
       login: '',
       password: ''
@@ -138,7 +136,7 @@
   const deliverySubmission = async (params) => {
     await addNotes($selectedTab, {
       ...params,
-      id: noteId,
+      id: uuidv4(),
     })
       .then(async () => {
         successMessage = 'Nota adicionada com sucesso!'

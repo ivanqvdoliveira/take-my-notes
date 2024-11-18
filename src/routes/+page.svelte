@@ -13,6 +13,11 @@
   let notFilteredPasswordList = [];
   let serverList = [];
   let othersList = [];
+  let defaultValues = {
+    passwordList: [],
+    serverList: [],
+    othersList: []
+  }
 
   const setupRequest = async (collection) => {
     return await requestNotes(collection);
@@ -37,6 +42,12 @@
         notFilteredPasswordList = data.filteredPassword
         serverList = data.filteredServer
         othersList = data.filteredOthers
+
+        defaultValues = {
+          passwordList: aggregatePasswords(data.filteredPassword),
+          serverList: data.filteredServer,
+          othersList: data.filteredOthers
+        }
       }
     })
 
@@ -63,6 +74,7 @@
     }, {});
 
     passwordList = Object.values(grouped);
+    return passwordList;
   }
 
 
@@ -76,11 +88,13 @@
 
   const onChangeSearch = (value) => {
     if (value === '' || !value) {
-      filteredList = null
+      passwordList = defaultValues.passwordList
+      serverList = defaultValues.serverList
+      othersList = defaultValues.othersList
       return
     }
 
-    filteredList = onSearchNotes(value)
+    onSearchNotes(value)
   }
 
   const tabHasChanged = async (collection) => {
@@ -92,34 +106,43 @@
 
   const onSearchNotes = (search) => {
     const termo = search.toLowerCase();
-    let resultados = [];
+    let passList = []
+    let servers = []
+    let others = []
 
-    Array.prototype.push.apply(resultados, notFilteredPasswordList.filter(item =>
+    Array.prototype.push.apply(passList, notFilteredPasswordList.filter(item =>
       item.name && item.name.toLowerCase().includes(termo) ||
       item.password && item.password.toLowerCase().includes(termo) ||
       item?.observation && item.observation.toLowerCase().includes(termo) ||
       item?.url && item.url.toLowerCase().includes(termo)
     ));
 
-    serverList.map(server => {
-      Array.prototype.push.apply(resultados, server?.services.filter(item =>
-        server.clientName.toLowerCase().includes(termo) ||
-        server?.observation && server.observation.toLowerCase().includes(termo) ||
-        item.serviceName && item.serviceName.toLowerCase().includes(termo) ||
-        item.login && item.login.toLowerCase().includes(termo) ||
-        item.password && item.password.toLowerCase().includes(termo) ||
-        item?.url && item.url.toLowerCase().includes(termo)
-      ));
+    serverList.forEach(server => {
+      const matchesServer = server.clientName.toLowerCase().includes(termo) ||
+       server.observation?.toLowerCase().includes(termo);
 
-    Array.prototype.push.apply(resultados, othersList.filter(item =>
+      const matchesService = server.services.some(item =>
+        item.serviceName?.toLowerCase().includes(termo) ||
+        item.login?.toLowerCase().includes(termo) ||
+        item.password?.toLowerCase().includes(termo) ||
+        item.url?.toLowerCase().includes(termo)
+      );
+
+      if (matchesServer || matchesService) {
+        servers.push(server);
+      }
+    });
+
+    Array.prototype.push.apply(others, othersList.filter(item =>
       item.name && item.name.toLowerCase().includes(termo) ||
       item.login && item.login.toLowerCase().includes(termo) ||
       item.password && item.password.toLowerCase().includes(termo) ||
       item?.observation && item.observation.toLowerCase().includes(termo)
     ));
-    })
 
-    return resultados;
+    aggregatePasswords(passList)
+    serverList = servers
+    othersList = others
   }
 </script>
 
@@ -139,7 +162,6 @@
     <GroupTab tabHasChanged={tabHasChanged} />
     <SearchSection onChangeSearch={onChangeSearch} />
     <NotesList
-      filteredList={filteredList}
       passwordList={passwordList}
       serverList={serverList}
       othersList={othersList}
