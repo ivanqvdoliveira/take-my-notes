@@ -13,7 +13,6 @@
   import { deleteNote } from '../../requests/deleteNote';
 
   export let selectedItem = null;
-  export let filteredList;
   export let passwordList;
   export let serverList;
   export let othersList;
@@ -31,21 +30,30 @@
   let successMsg = ''
   let isEditOrder = {};
 
-  const noteId = uuidv4();
+  $: if (passwordList || serverList || othersList) {
+    resetDefaults()
+  }
 
   const getFormattedPassword = (password) => {
     const halfLength = Math.ceil(password.length / 2);
     return password.substring(0, halfLength) + '*'.repeat(password.length - halfLength);
   }
 
-  const onCloseModal = () => {
-    showModal = false;
-    form = {};
-    editServer = {isEdit: false}
-    isEditOrder = {};
-    idPassword = null;
+  const resetDefaults = () => {
     selectedName = null;
     selectedItem = null;
+    isEdit = false;
+    form = {};
+    newFormPassword = false;
+    isvisible = false;
+    idPassword = null;
+    showModal = false;
+    editServer = {isEdit: false}
+    isEditOrder = {};
+  }
+
+  const onCloseModal = () => {
+    resetDefaults()
   }
 
   const copyText = (text, id) => {
@@ -215,7 +223,7 @@
     }
 
     const params = {
-      id: noteId,
+      id: uuidv4(),
       group: $selectedTab,
       type: 'passwords',
       name: form.name,
@@ -227,7 +235,7 @@
     try {
       await addNotes($selectedTab, {
         ...params,
-        id: noteId,
+        id: uuidv4(),
       });
 
       successMsg = 'Senha criada com sucesso';
@@ -289,110 +297,65 @@
       <h3 class="text-orange-400">Nenhum resultado encontrado</h3>
     </div>
   {:else}
-    {#if filteredList}
-      <div class="container">
-        <h2>Resultados</h2>
-        <ul class="sub-item server">
-          {#if filteredList.length === 0}
-            <li>
-              <p class="block w-full text-lg text-center py-10 text-orange-400">Nenhum resultado encontrado</p>
-            </li>
-          {/if}
-          {#each filteredList as item}
-            <li class="border border-dashed border-neutral-800">
-              <h2>{item.name || item.serviceName}</h2>
-              <div class="p-2 text-base">
-                <p>
-                  <b>Login:</b>
-                  {item?.login || '-'}
-                </p>
-                <p class="flex items-center gap-1 relative">
-                  <b>Senha:</b>
-                  {isvisible && idPassword === item.id ? item.password : getFormattedPassword(item.password)}
-                  <button class="icon server" on:click={() => toggleVisibility(item.id)}>
-                    <i class="fa-solid fa-eye-slash" />
-                  </button>
-                  {#if copied && item.id === idPassword}
-                    <div class="copied">copiado</div>
-                  {/if}
-                  <button class="icon server" on:click={() => copyText(item.password, item.id)}>
-                    <i class="fa-solid fa-copy" />
-                  </button>
-                </p>
-                <p>
-                  <b>Observação:</b>
-                  {item?.observation || '-'}
-                </p>
-                <p>
-                  <b>Url:</b>
-                  {item?.url || '-'}
-                </p>
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {:else}
-      {#if passwordList.length}
-        <PasswordsList
-          isvisible={isvisible}
-          idPassword={idPassword}
-          getFormattedPassword={getFormattedPassword}
-          toggleVisibility={toggleVisibility}
-          copied={copied}
-          copyText={copyText}
-          passwordList={passwordList}
-          onClickName={onClickName}
-          onClickItem={onClickItem}
-          selectedName={selectedName}
-          isEdit={isEdit}
-          onEditClick={onEditClick}
-          onCancelEditClick={onCancelEditClick}
-          form={form}
-          newForm={newFormPassword}
-          selectedItem={selectedItem}
-          onCancelCreateClick={onCancelCreateClick}
-          onCreateClick={onCreateClick}
-          onCancelClick={onCancelClick}
-          onSavePasswordClick={handleSaveNewPassword}
-          onChangeInpunt={handleChangeInpunt}
-          submitError={submitError}
-          onSaveEditClick={onSaveEditClick}
-          onDeleteClick={onDeleteClick}
-        />
-      {/if}
+    {#if passwordList.length}
+      <PasswordsList
+        isvisible={isvisible}
+        idPassword={idPassword}
+        getFormattedPassword={getFormattedPassword}
+        toggleVisibility={toggleVisibility}
+        copied={copied}
+        copyText={copyText}
+        passwordList={passwordList}
+        onClickName={onClickName}
+        onClickItem={onClickItem}
+        selectedName={selectedName}
+        isEdit={isEdit}
+        onEditClick={onEditClick}
+        onCancelEditClick={onCancelEditClick}
+        form={form}
+        newForm={newFormPassword}
+        selectedItem={selectedItem}
+        onCancelCreateClick={onCancelCreateClick}
+        onCreateClick={onCreateClick}
+        onCancelClick={onCancelClick}
+        onSavePasswordClick={handleSaveNewPassword}
+        onChangeInpunt={handleChangeInpunt}
+        submitError={submitError}
+        onSaveEditClick={onSaveEditClick}
+        onDeleteClick={onDeleteClick}
+      />
+    {/if}
 
-      {#if serverList.length}
-        <ServersList
-          listOfServers={serverList}
-          isvisible={isvisible}
-          idPassword={idPassword}
-          getFormattedPassword={getFormattedPassword}
-          toggleVisibility={toggleVisibility}
-          copied={copied}
-          copyText={copyText}
-          onEditClick={onEditServerClick}
-        />
-      {/if}
+    {#if serverList.length}
+      <ServersList
+        listOfServers={serverList}
+        isvisible={isvisible}
+        idPassword={idPassword}
+        getFormattedPassword={getFormattedPassword}
+        toggleVisibility={toggleVisibility}
+        copied={copied}
+        copyText={copyText}
+        onEditClick={onEditServerClick}
+      />
+    {/if}
 
-      {#if othersList.length}
-        <OthersList
-          listOfOthers={othersList}
-          isvisible={isvisible}
-          idPassword={idPassword}
-          getFormattedPassword={getFormattedPassword}
-          toggleVisibility={toggleVisibility}
-          copied={copied}
-          copyText={copyText}
-          onEditClick={onEditOtherClick}
-          isEditOrder={isEditOrder}
-          onFormChange={handleChangeOthers}
-          onClose={handleCloseOthers}
-          onSaveOthersClick={handleSaveOthers}
-          form={form}
-          onDeleteClick={onDeleteClick}
-        />
-      {/if}
+    {#if othersList.length}
+      <OthersList
+        listOfOthers={othersList}
+        isvisible={isvisible}
+        idPassword={idPassword}
+        getFormattedPassword={getFormattedPassword}
+        toggleVisibility={toggleVisibility}
+        copied={copied}
+        copyText={copyText}
+        onEditClick={onEditOtherClick}
+        isEditOrder={isEditOrder}
+        onFormChange={handleChangeOthers}
+        onClose={handleCloseOthers}
+        onSaveOthersClick={handleSaveOthers}
+        form={form}
+        onDeleteClick={onDeleteClick}
+      />
     {/if}
   {/if}
 
@@ -406,65 +369,3 @@
     />
   {/if}
 </section>
-
-
-<style lang="scss">
-  button {
-    background-color: transparent;
-    border: none;
-
-    &.icon {
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &.server {
-        i {
-          @apply text-sm;
-        }
-      }
-    }
-
-    i {
-      font-size: 1.5rem
-    }
-  }
-
-  .container {
-    @apply border border-solid border-neutral-600 mt-5 mx-auto;
-  }
-
-  .copied {
-    @apply p-1 bg-orange-200 border border-orange-500 text-orange-500 font-bold text-sm rounded absolute left-3 top-[-25px];
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 10px solid rgb(249 115 22);
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);}
-  }
-
-  h2 {
-    @apply border-b border-neutral-600 p-2 font-bold bg-neutral-800 text-neutral-300 text-lg;
-  }
-
-  .sub-item {
-    @apply border border-solid border-neutral-600 p-2 text-neutral-300 bg-neutral-600 text-[13px] flex flex-wrap gap-2;
-
-    &.server {
-      @apply block p-4;
-
-      li {
-        @apply w-full mb-3;
-      }
-    }
-  }
-</style>
